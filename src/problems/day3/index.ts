@@ -11,16 +11,19 @@ const part1 = (input: string[]) => {
     const itemSet = new Set<string>()
 
     let duplicateItem = ''
-    for (const item of rucksack) {
-      if (itemSet.has(item)) {
-        duplicateItem = item
-        break
-      }
+    let i = 0
 
-      itemSet.add(item)
+    for (; i < rucksack.length / 2; i++) {
+      itemSet.add(rucksack[i])
     }
 
-    console.log(duplicateItem)
+    for (; i < rucksack.length; i++) {
+      if (itemSet.has(rucksack[i])) {
+        duplicateItem = rucksack[i]
+        break
+      }
+    }
+
     return (sum += getPriority(duplicateItem))
   }, 0)
 
@@ -28,14 +31,52 @@ const part1 = (input: string[]) => {
 }
 
 const part2 = (input: string[]) => {
-  // input.forEach((rucksack) => {
-  //   console.log(rucksack[0], getPriority(rucksack[0]))
-  // })
+  const groupArrayByThree = (input: string[]): string[][] => {
+    const arrays = []
+
+    for (let i = input.length - 1; i >= 0; i -= 3) {
+      arrays.push([input.pop(), input.pop(), input.pop()])
+    }
+
+    return arrays
+  }
+
+  const groupedElves = groupArrayByThree(input)
+
+  let totalSum = 0
+
+  for (const elves of groupedElves) {
+    const itemMap = new Map<string, { count: number; currentElf: string }>()
+    let badgeItem = '-100'
+
+    for (const elf of elves) {
+      for (const item of elf) {
+        const itemInMap = itemMap.get(item)
+
+        if (itemInMap && itemInMap.count + 1 >= 3) {
+          badgeItem = item
+          break
+        } else if (itemInMap && itemInMap.currentElf === elf) {
+          console.log(item, itemInMap.currentElf, elf)
+          continue
+        } else if (itemInMap) {
+          itemInMap.count++
+        } else {
+          itemMap.set(item, { count: 1, currentElf: elf })
+        }
+      }
+    }
+
+    console.log(badgeItem)
+    totalSum += getPriority(badgeItem)
+  }
+
+  logPartAnswer(2, totalSum)
 }
 
 export default async () => {
   const input = await readTxtFile(__dirname + '/input.txt')
 
   part1(input)
-  // part2(input)
+  part2(input)
 }

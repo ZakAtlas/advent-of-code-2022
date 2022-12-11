@@ -1,6 +1,3 @@
-// Authors:
-// Jant & Zak
-
 import { logPartAnswer, readTxtFile } from '../../utils'
 
 const part1 = (input: string[]) => {

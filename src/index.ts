@@ -1,24 +1,34 @@
 import problems from './problems'
+import * as Prompt from './prompts'
 
-import { logBorder, logDayPerformance } from './utils'
+const runProgram = async () => {
+  const numberOfProblems = problems.length
 
-const dayWrapper = async (day: number, dayFunction: () => Promise<void>) => {
-  logBorder(day)
+  let again = 'y'
 
-  const startTime = performance.now()
+  while (again === 'y') {
+    console.clear()
 
-  await dayFunction()
+    const problemIndex = await Prompt.getProblemInput(numberOfProblems)
 
-  const endTime = performance.now()
+    await problems[problemIndex]()
 
-  logDayPerformance(startTime, endTime)
-  logBorder(day)
+    again = await Prompt.getAgainInput()
+  }
 }
 
 const main = async () => {
-  //await dayWrapper(1, day1);
-  // await dayWrapper(2, day2)
-  await dayWrapper(3, problems[2])
+  if (process.argv[2] !== 'debug') {
+    runProgram()
+  } else {
+    const debugArgProblem = process.argv[3]
+
+    if (!debugArgProblem) {
+      throw new Error('Please enter a problem number argument.')
+    }
+
+    await problems[debugArgProblem]()
+  }
 }
 
 main()
